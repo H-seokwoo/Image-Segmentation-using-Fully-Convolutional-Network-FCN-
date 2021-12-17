@@ -15,9 +15,7 @@ ___
 **Experimental results and number of model parameters**
 ___
 FCN32:
----
 Pixel accuracy : 88.288, mIoU: 0.597
 ---
 FCN8:
----
 Pixel accuracy : 88.705, mIoU: 0.
