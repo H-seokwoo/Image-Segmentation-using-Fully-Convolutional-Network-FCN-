@@ -1,3 +1,27 @@
+import os
+import numpy as np
+import time
+from pathlib import Path
+from PIL import Image
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.utils.data import DataLoader
+from torchvision.datasets import VOCSegmentation, SBDataset
+from torchvision.datasets.vision import StandardTransform
+from torchvision.utils import make_grid
+from torchvision import transforms
+from torchvision.models.vgg import VGG, vgg16, make_layers
+from torch.optim import SGD
+from torch.utils.tensorboard import SummaryWriter
+
+torch.backends.cudnn.benchmark = True
+
+!pip install git+https://github.com/lucasb-eyer/pydensecrf.git
+import pydensecrf.densecrf as dcrf
+import pydensecrf.utils as utils
+
 # Extracts bias and non-bias parameters from a model.
 def get_parameters(model, bias=False):
     for m in model.modules():
@@ -175,9 +199,9 @@ class FCN32(VGG):
         # fc layers in vgg are all converted into conv layers.
         #################################
         self.conv1 = nn.Conv2d(512,4096,kernel_size = 7)
-        #relu + # dropout Àû¿ë
+        #relu + # dropout Ã€Ã»Â¿Ã«
         self.conv2 = nn.Conv2d(4096,4096,kernel_size = 1)
-        #relu + # dropout Àû¿ë
+        #relu + # dropout Ã€Ã»Â¿Ã«
         #################################
 
         # Prediction layer with 1x1 convolution layer.
@@ -294,7 +318,7 @@ class FCN8(FCN32):
         
         out2 = self.conv4(vgg_pool4 *0.01)
         out2 = transforms.functional.crop(out2, left=5, top=5, height=out1.size(2), width=out1.size(3))
-        out2 = self.convtrans2(out1 + out2) # 2 ¹øÂ° convtrnas
+        out2 = self.convtrans2(out1 + out2) # 2 Â¹Ã¸Ã‚Â° convtrnas
         
         out3 = self.conv5(vgg_pool3 *0.0001) # vggpol3
         out3 = transforms.functional.crop(out3, left=9, top=9, height=out2.size(2), width=out2.size(3)) # -- picture3
